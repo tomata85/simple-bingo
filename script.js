@@ -18,7 +18,8 @@ const ACTIVITIES = [
 ];
 
 const TILES_TO_SHOW = 25;
-const STORAGE_KEY = 'bingoProgress';
+const TILES_ORDER_KEY = 'bingoTilesOrder';
+const CLICKED_TILES_KEY = 'bingoProgress';
 
 /**
  * Shuffle array using Fisher-Yates algorithm
@@ -35,6 +36,27 @@ function shuffleArray(array) {
 }
 
 /**
+ * Get or create tile order - persists across page reloads via cookie
+ * @returns {Array} Ordered activities for tiles
+ */
+function getTileOrder() {
+    const savedOrder = getCookie(TILES_ORDER_KEY);
+    
+    if (savedOrder) {
+        try {
+            return JSON.parse(decodeURIComponent(savedOrder));
+        } catch (error) {
+            console.error('Failed to parse saved tile order:', error);
+        }
+    }
+    
+    // Create new order if none exists
+    const newOrder = shuffleArray(ACTIVITIES).slice(0, TILES_TO_SHOW);
+    setCookie(TILES_ORDER_KEY, JSON.stringify(newOrder));
+    return newOrder;
+}
+
+/**
  * Create and render bingo tile
  * @param {string} activity - Activity text
  * @returns {HTMLElement} Tile element
@@ -44,7 +66,7 @@ function createTile(activity) {
     tile.className = 'tile';
     tile.textContent = activity;
 
-    // Restore clicked state from storage
+    // Restore clicked state from cookie
     const savedActivities = getSavedProgress();
     if (savedActivities.includes(activity)) {
         tile.classList.add('clicked');
@@ -60,11 +82,11 @@ function createTile(activity) {
 }
 
 /**
- * Initialize bingo grid with random activities
+ * Initialize bingo grid with saved or new tile order
  */
 function initializeBingoGrid() {
     const gridElement = document.getElementById('bingoGrid');
-    const selectedActivities = shuffleArray(ACTIVITIES).slice(0, TILES_TO_SHOW);
+    const selectedActivities = getTileOrder();
 
     selectedActivities.forEach(activity => {
         const tile = createTile(activity);
@@ -73,22 +95,54 @@ function initializeBingoGrid() {
 }
 
 /**
- * Save current progress to local storage
+ * Set a cookie value
+ * @param {string} key - Cookie key
+ * @param {string} value - Cookie value
+ * @param {number} days - Days until expiration (default: 365)
+ */
+function setCookie(key, value, days = 365) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = 'expires=' + date.toUTCString();
+    document.cookie = key + '=' + encodeURIComponent(value) + ';' + expires + ';path=/';
+}
+
+/**
+ * Get a cookie value
+ * @param {string} key - Cookie key
+ * @returns {string|null} Cookie value or null if not found
+ */
+function getCookie(key) {
+    const name = key + '=';
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const cookieArray = decodedCookie.split(';');
+    
+    for (let cookie of cookieArray) {
+        cookie = cookie.trim();
+        if (cookie.indexOf(name) === 0) {
+            return cookie.substring(name.length);
+        }
+    }
+    return null;
+}
+
+/**
+ * Save current progress (clicked tiles) to cookie
  */
 function saveProgress() {
     const clickedTiles = document.querySelectorAll('.tile.clicked');
     const completedActivities = Array.from(clickedTiles).map(tile => tile.textContent);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(completedActivities));
+    setCookie(CLICKED_TILES_KEY, JSON.stringify(completedActivities));
 }
 
 /**
- * Get saved progress from local storage
+ * Get saved progress from cookie
  * @returns {Array} List of completed activities
  */
 function getSavedProgress() {
+    const saved = getCookie(CLICKED_TILES_KEY);
     try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        return saved ? JSON.parse(saved) : [];
+        return saved ? JSON.parse(decodeURIComponent(saved)) : [];
     } catch (error) {
         console.error('Failed to load saved progress:', error);
         return [];
