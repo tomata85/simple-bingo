@@ -23,11 +23,25 @@ const CLICKED_TILES_KEY = 'bingoProgress';
 const NAME_KEY = 'bingoPlayerName';
 
 /**
- * Shuffle array using Fisher-Yates algorithm
- * @param {Array} array - Array to shuffle
- * @returns {Array} Shuffled array
+ * Show error animation on name input
  */
-function shuffleArray(array) {
+function showNameError() {
+    const nameInput = document.getElementById('nameInput');
+    nameInput.classList.add('error');
+    
+    // Remove the class after animation completes (0.6s * 3 = 1.8s)
+    setTimeout(() => {
+        nameInput.classList.remove('error');
+    }, 1800);
+}
+
+/**
+ * Check if name is filled
+ */
+function isNameFilled() {
+    const nameInput = document.getElementById('nameInput');
+    return nameInput.value.trim().length > 0;
+}
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const randomIndex = Math.floor(Math.random() * (i + 1));
@@ -73,8 +87,12 @@ function createTile(activity) {
         tile.classList.add('clicked');
     }
 
-    // Add click handler
+    // Add click handler with name validation
     tile.addEventListener('click', () => {
+        if (!isNameFilled()) {
+            showNameError();
+            return;
+        }
         tile.classList.toggle('clicked');
         saveProgress();
     });
