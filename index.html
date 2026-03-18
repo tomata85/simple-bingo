@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koh Lanta Bingo 2026</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        .tile {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .tile.clicked {
+            background-color: green;
+            color: white;
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Koh Lanta Bingo 2026</h1>
+    <div class="grid" id="bingoGrid"></div>
+    <script>
+        const activities = [
+            'Sunset at Lym\'s', 'Mem\'s coffee corner', 'Coffee at Escape cafe', 
+            'Coffee at Slowbar Caffetteria', 'Eat at Bun noodles', 'Eat at Spring rolls', 
+            'Swim in Secret beach or Beautiful beach', 'Dance in Pangea', 
+            'Sing Kareoke at Free Descent', 'Dance at Korner Bar', 
+            'Eat at Indira Fusion', 'Eat at Yang', 'Have a smoothie at Fullfil', 
+            'Visit Lanta Noi', 'Visit Old Town', 'Hike National Park', 
+            'Visit the Buddhist Center', 'Chill at Why Not Bar', 'Dance at Horizon Bar', 
+            'Have breakfast in Tuesday morning', 'Attend a quiz', 
+            'Eat at Aleena Minimart', 'Walk through Long Beach', 
+            'Chill at Sanctuary', 'Go to New Moon Party'
+        ];
+
+        // Shuffle the activities
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        const selectedActivities = shuffle(activities).slice(0, 16);
+
+        // Create bingo tiles
+        const bingoGrid = document.getElementById('bingoGrid');
+        selectedActivities.forEach(activity => {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.textContent = activity;
+
+            tile.onclick = function() {
+                this.classList.toggle('clicked');
+                saveProgress();
+            };
+            bingoGrid.appendChild(tile);
+        });
+
+        function saveProgress() {
+            const clickedTiles = document.querySelectorAll('.tile.clicked');
+            const activitiesClicked = Array.from(clickedTiles).map(tile => tile.textContent);
+            document.cookie = 'bingoProgress=' + JSON.stringify(activitiesClicked) + ';path=/';
+        }
+    </script>
+</body>
+</html>
