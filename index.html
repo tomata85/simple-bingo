@@ -5,33 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Koh Lanta Bingo 2026</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            background-color: #f4f4f4;
+            background: linear-gradient(135deg, #0d7e7e 0%, #0a5f5f 50%, #1e5f7f 100%);
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1 {
+            margin: 20px 0;
+            font-size: 32px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            letter-spacing: 1px;
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 20px auto;
-            max-width: 600px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin: 15px auto;
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 1;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
         .tile {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 5px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.2;
+            word-break: break-word;
+            overflow: hidden;
+            aspect-ratio: 1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: #0d7e7e;
+        }
+        .tile:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
         }
         .tile.clicked {
-            background-color: green;
+            background: linear-gradient(135deg, #00d4aa 0%, #00b896 100%);
             color: white;
+            border-color: #009966;
+            box-shadow: 0 6px 20px rgba(0, 212, 170, 0.4);
+            transform: scale(0.98);
+        }
+        .tile.clicked:hover {
+            transform: scale(1.02);
         }
         @media (max-width: 600px) {
+            body {
+                padding: 8px;
+            }
+            h1 {
+                font-size: 22px;
+                margin: 10px 0;
+            }
             .grid {
-                grid-template-columns: repeat(2, 1fr);
+                gap: 4px;
+                max-width: 100%;
+                margin: 10px auto;
+            }
+            .tile {
+                padding: 4px;
+                font-size: 10px;
+            }
+        }
+        @media (max-width: 400px) {
+            body {
+                padding: 5px;
+            }
+            h1 {
+                font-size: 18px;
+                margin: 8px 0;
+            }
+            .grid {
+                gap: 3px;
+                padding: 4px;
+                margin: 8px auto;
+            }
+            .tile {
+                padding: 3px;
+                font-size: 9px;
             }
         }
     </style>
@@ -62,7 +137,7 @@
             return array;
         }
 
-        const selectedActivities = shuffle(activities).slice(0, 16);
+        const selectedActivities = shuffle(activities).slice(0, 25);
 
         // Create bingo tiles
         const bingoGrid = document.getElementById('bingoGrid');
