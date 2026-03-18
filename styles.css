@@ -23,6 +23,35 @@ h1 {
     letter-spacing: 1px;
 }
 
+/* Name section */
+.name-section {
+    margin: 15px 0;
+}
+
+.name-input {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #0d7e7e;
+    text-align: center;
+    max-width: 300px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.name-input:focus {
+    outline: none;
+    background: white;
+    border-color: #00d4aa;
+    box-shadow: 0 0 10px rgba(0, 212, 170, 0.3);
+}
+
+.name-input::placeholder {
+    color: rgba(13, 126, 126, 0.5);
+}
+
 /* Grid container */
 .grid {
     display: grid;
@@ -107,6 +136,11 @@ h1 {
     h1 {
         font-size: 18px;
         margin: 8px 0;
+    }
+    .name-input {
+        padding: 8px 12px;
+        font-size: 14px;
+        max-width: 90%;
     }
     .grid {
         gap: 3px;

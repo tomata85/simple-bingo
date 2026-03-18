@@ -20,6 +20,7 @@ const ACTIVITIES = [
 const TILES_TO_SHOW = 25;
 const TILES_ORDER_KEY = 'bingoTilesOrder';
 const CLICKED_TILES_KEY = 'bingoProgress';
+const NAME_KEY = 'bingoPlayerName';
 
 /**
  * Shuffle array using Fisher-Yates algorithm
@@ -95,6 +96,42 @@ function initializeBingoGrid() {
 }
 
 /**
+ * Save player name to cookie
+ */
+function saveName() {
+    const nameInput = document.getElementById('nameInput');
+    const name = nameInput.value.trim();
+    if (name) {
+        setCookie(NAME_KEY, name);
+    } else {
+        // Clear cookie if name is empty
+        setCookie(NAME_KEY, '', -1);
+    }
+}
+
+/**
+ * Load player name from cookie and set up event listeners
+ */
+function initializeName() {
+    const nameInput = document.getElementById('nameInput');
+    
+    // Load saved name
+    const savedName = getCookie(NAME_KEY);
+    if (savedName) {
+        nameInput.value = decodeURIComponent(savedName);
+    }
+    
+    // Save name on input change
+    nameInput.addEventListener('blur', saveName);
+    nameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            saveName();
+            nameInput.blur();
+        }
+    });
+}
+
+/**
  * Set a cookie value
  * @param {string} key - Cookie key
  * @param {string} value - Cookie value
@@ -150,4 +187,7 @@ function getSavedProgress() {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', initializeBingoGrid);
+document.addEventListener('DOMContentLoaded', () => {
+    initializeName();
+    initializeBingoGrid();
+});
