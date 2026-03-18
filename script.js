@@ -59,13 +59,16 @@ function getTileOrder() {
     
     if (savedOrder) {
         try {
-            return JSON.parse(decodeURIComponent(savedOrder));
+            const parsed = JSON.parse(decodeURIComponent(savedOrder));
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+            }
         } catch (error) {
             console.error('Failed to parse saved tile order:', error);
         }
     }
     
-    // Create new order if none exists
+    // Create new order if none exists or parsing failed
     const newOrder = shuffleArray(ACTIVITIES).slice(0, TILES_TO_SHOW);
     setCookie(TILES_ORDER_KEY, JSON.stringify(newOrder));
     return newOrder;
@@ -136,7 +139,11 @@ function initializeName() {
     // Load saved name
     const savedName = getCookie(NAME_KEY);
     if (savedName) {
-        nameInput.value = decodeURIComponent(savedName);
+        try {
+            nameInput.value = decodeURIComponent(savedName);
+        } catch (error) {
+            console.error('Failed to load player name:', error);
+        }
     }
     
     // Save name on input change
@@ -197,11 +204,14 @@ function saveProgress() {
 function getSavedProgress() {
     const saved = getCookie(CLICKED_TILES_KEY);
     try {
-        return saved ? JSON.parse(decodeURIComponent(saved)) : [];
+        if (saved) {
+            const parsed = JSON.parse(decodeURIComponent(saved));
+            return Array.isArray(parsed) ? parsed : [];
+        }
     } catch (error) {
         console.error('Failed to load saved progress:', error);
-        return [];
     }
+    return [];
 }
 
 // Initialize on page load
