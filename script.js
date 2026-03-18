@@ -21,6 +21,64 @@ const TILES_TO_SHOW = 25;
 const TILES_ORDER_KEY = 'bingoTilesOrder';
 const CLICKED_TILES_KEY = 'bingoProgress';
 const NAME_KEY = 'bingoPlayerName';
+const API_BASE = '/api';
+
+/**
+ * Save user data to server
+ * @param {string} playerName - Player name
+ * @param {Array} tilesOrder - Order of tiles
+ * @param {Array} clickedTiles - List of clicked tile activities
+ */
+async function saveToServer(playerName, tilesOrder, clickedTiles) {
+    try {
+        const response = await fetch(`${API_BASE}/save`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: playerName,
+                tilesOrder: tilesOrder,
+                clickedTiles: clickedTiles,
+                timestamp: new Date().toISOString()
+            })
+        });
+        
+        if (response.ok) {
+            console.log('Data saved to server');
+            return true;
+        } else {
+            console.error('Failed to save data to server');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error saving to server:', error);
+        return false;
+    }
+}
+
+/**
+ * Load user data from server
+ * @param {string} playerName - Player name
+ * @returns {Object|null} User data or null if not found
+ */
+async function loadFromServer(playerName) {
+    try {
+        const response = await fetch(`${API_BASE}/load/${encodeURIComponent(playerName)}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Data loaded from server');
+            return data;
+        } else {
+            console.log('No server data found, using cookies');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error loading from server:', error);
+        return null;
+    }
+}
 
 /**
  * Show error animation on name input
@@ -91,8 +149,14 @@ function createTile(activity) {
     tile.className = 'tile';
     tile.textContent = activity;
 
-    // Restore clicked state from cookie
-    const savedActivities = getSavedProgress();
+    // Restore clicked state from server data first, then fallback to cookie
+    let savedActivities;
+    if (window.pendingClickedTiles) {
+        savedActivities = window.pendingClickedTiles;
+    } else {
+        savedActivities = getSavedProgress();
+    }
+    
     if (savedActivities.includes(activity)) {
         tile.classList.add('clicked');
     }
@@ -115,12 +179,24 @@ function createTile(activity) {
  */
 function initializeBingoGrid() {
     const gridElement = document.getElementById('bingoGrid');
-    const selectedActivities = getTileOrder();
+
+    // Use server data if available and has tiles order
+    let selectedActivities;
+    if (window.pendingServerData && window.pendingServerData.tilesOrder) {
+        selectedActivities = window.pendingServerData.tilesOrder;
+        // Restore clicked tiles from server data
+        window.pendingClickedTiles = window.pendingServerData.clickedTiles || [];
+    } else {
+        selectedActivities = getTileOrder();
+    }
 
     selectedActivities.forEach(activity => {
         const tile = createTile(activity);
         gridElement.appendChild(tile);
     });
+    
+    // Clear temporary data
+    delete window.pendingServerData;
 }
 
 /**
@@ -131,6 +207,10 @@ function saveName() {
     const name = nameInput.value.trim();
     if (name) {
         setCookie(NAME_KEY, name);
+        // Save to server
+        const tileOrder = getTileOrder();
+        const clickedTiles = Array.from(document.querySelectorAll('.tile.clicked')).map(tile => tile.textContent);
+        saveToServer(name, tileOrder, clickedTiles);
     } else {
         // Clear cookie if name is empty
         setCookie(NAME_KEY, '', -1);
@@ -140,14 +220,22 @@ function saveName() {
 /**
  * Load player name from cookie and set up event listeners
  */
-function initializeName() {
+async function initializeName() {
     const nameInput = document.getElementById('nameInput');
     
     // Load saved name
     const savedName = getCookie(NAME_KEY);
     if (savedName) {
         try {
-            nameInput.value = decodeURIComponent(savedName);
+            const decodedName = decodeURIComponent(savedName);
+            nameInput.value = decodedName;
+            
+            // Try to load player data from server
+            const serverData = await loadFromServer(decodedName);
+            if (serverData) {
+                // Temporarily store server data to use during initialization
+                window.pendingServerData = serverData;
+            }
         } catch (error) {
             console.error('Failed to load player name:', error);
         }
@@ -202,6 +290,13 @@ function saveProgress() {
     const clickedTiles = document.querySelectorAll('.tile.clicked');
     const completedActivities = Array.from(clickedTiles).map(tile => tile.textContent);
     setCookie(CLICKED_TILES_KEY, JSON.stringify(completedActivities));
+    
+    // Also save to server if player has a name
+    const nameInput = document.getElementById('nameInput');
+    if (nameInput.value.trim()) {
+        const tileOrder = getTileOrder();
+        saveToServer(nameInput.value.trim(), tileOrder, completedActivities);
+    }
 }
 
 /**
@@ -222,7 +317,7 @@ function getSavedProgress() {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    initializeName();
+document.addEventListener('DOMContentLoaded', async () => {
+    await initializeName();
     initializeBingoGrid();
 });
