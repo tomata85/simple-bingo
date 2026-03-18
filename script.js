@@ -42,6 +42,13 @@ function isNameFilled() {
     const nameInput = document.getElementById('nameInput');
     return nameInput.value.trim().length > 0;
 }
+
+/**
+ * Shuffle array using Fisher-Yates algorithm
+ * @param {Array} array - Array to shuffle
+ * @returns {Array} Shuffled array
+ */
+function shuffleArray(array) {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const randomIndex = Math.floor(Math.random() * (i + 1));
