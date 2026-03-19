@@ -21,7 +21,10 @@ const TILES_TO_SHOW = 25;
 const TILES_ORDER_KEY = 'bingoTilesOrder';
 const CLICKED_TILES_KEY = 'bingoProgress';
 const NAME_KEY = 'bingoPlayerName';
-const API_BASE = '/api';
+const RAILWAY_API_ORIGIN = 'https://web-production-7a1e8.up.railway.app';
+const API_BASE = window.location.hostname === 'localhost'
+    ? '/api'
+    : `${RAILWAY_API_ORIGIN}/api`;
 
 /**
  * Save user data to server

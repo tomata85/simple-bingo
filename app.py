@@ -5,11 +5,20 @@ Handles saving and loading user data to/from JSON files
 """
 
 from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 import json
 import os
 from pathlib import Path
 
 app = Flask(__name__, static_folder='.', static_url_path='')
+CORS(
+    app,
+    resources={r"/api/*": {"origins": [
+        "https://tomata85.github.io",
+        "http://localhost:5000",
+        "http://127.0.0.1:5000"
+    ]}}
+)
 
 # Data directory for storing user JSON files
 DATA_DIR = Path('data')
