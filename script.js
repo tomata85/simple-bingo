@@ -207,6 +207,9 @@ function saveName() {
     const name = nameInput.value.trim();
     if (name) {
         setCookie(NAME_KEY, name);
+        nameInput.value = name;
+        nameInput.readOnly = true;
+        nameInput.classList.add('locked');
         // Save to server
         const tileOrder = getTileOrder();
         const clickedTiles = Array.from(document.querySelectorAll('.tile.clicked')).map(tile => tile.textContent);
@@ -229,6 +232,8 @@ async function initializeName() {
         try {
             const decodedName = decodeURIComponent(savedName);
             nameInput.value = decodedName;
+            nameInput.readOnly = true;
+            nameInput.classList.add('locked');
             
             // Try to load player data from server
             const serverData = await loadFromServer(decodedName);

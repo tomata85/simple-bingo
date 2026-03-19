@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koh Lanta Bingo Admin</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Koh Lanta Bingo Admin</h1>
+
+    <div class="admin-controls">
+        <label class="admin-label" for="userSelect">Select a player</label>
+        <select id="userSelect" class="admin-select">
+            <option value="">Choose a name...</option>
+        </select>
+        <p id="adminStatus" class="admin-status">Pick a name to view that bingo board.</p>
+        <a href="/" class="admin-link">Back to Bingo</a>
+    </div>
+
+    <div class="grid admin-grid" id="adminBingoGrid"></div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

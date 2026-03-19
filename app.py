@@ -71,6 +71,34 @@ def load_data(player_name):
         print(f'Error loading data: {e}')
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/users', methods=['GET'])
+def list_users():
+    """List all saved users for admin view"""
+    try:
+        users = []
+        for user_file in DATA_DIR.glob('*.json'):
+            try:
+                with open(user_file, 'r') as f:
+                    data = json.load(f)
+                display_name = data.get('name') or user_file.stem
+                users.append({
+                    'name': display_name,
+                    'file': user_file.name,
+                    'updatedAt': data.get('timestamp')
+                })
+            except Exception:
+                users.append({
+                    'name': user_file.stem,
+                    'file': user_file.name,
+                    'updatedAt': None
+                })
+
+        users.sort(key=lambda item: (item['name'] or '').lower())
+        return jsonify({'users': users}), 200
+    except Exception as e:
+        print(f'Error listing users: {e}')
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/delete/<player_name>', methods=['DELETE'])
 def delete_data(player_name):
     """Delete user data file"""
@@ -87,6 +115,9 @@ def delete_data(player_name):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_ENV') == 'development'
     print('Starting Koh Lanta Bingo Server...')
-    print('Visit http://localhost:5000 in your browser')
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    print(f'Listening on port {port}')
+    app.run(debug=debug, host='0.0.0.0', port=port)
