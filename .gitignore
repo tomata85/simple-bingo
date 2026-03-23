@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+
+# Runtime server data (do not commit user data)
+data/*.json
+
+# Keep directory structure while ignoring JSON payloads
+!data/.gitkeep

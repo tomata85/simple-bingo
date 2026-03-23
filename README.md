@@ -51,6 +51,11 @@ Then visit: `http://localhost:8000`
 
 ## Deploy to Production
 
+### Railway (Current Live Deployment)
+
+- App URL: `https://web-production-7a1e8.up.railway.app`
+- Admin URL: `https://web-production-7a1e8.up.railway.app/admin.html`
+
 For GitHub Pages hosting:
 1. Push to GitHub
 2. Enable GitHub Pages in repository settings
